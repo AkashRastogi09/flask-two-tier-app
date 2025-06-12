@@ -1,8 +1,8 @@
 #base images
-From python:3.9-slim
+FROM python:3.9-slim
 
 #define the working directory
-workdir /app
+WORKDIR /app
 
 # install required packages for system
 RUN apt-get update \
@@ -19,8 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy code
 
-copy . .
+COPY . .
 
 #run the code
 
-cmd ["python","app.py"]
+CMD ["python","app.py"]
