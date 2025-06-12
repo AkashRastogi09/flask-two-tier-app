@@ -1,0 +1,46 @@
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db1
+    ports:
+      - "3306:3306"
+    networks:
+      - two-tier
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=devops
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+    
+    healthcheck:                 
+     test: ["CMD-SHELL", "mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+     interval: 5s
+     retries: 5
+     timeout: 5s
+
+  flask-app:
+    build: .
+    container_name: flask-two-tier
+    ports:
+      - "5000:5000"
+    networks:
+      - two-tier
+    environment:
+      
+      - MYSQL_HOST=mysql-db       
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DB=devops           
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  db-data:
+
+networks:
+  two-tier:
+
